@@ -15,24 +15,29 @@ export default function Generate() {
     const [open, setOpen] = useState(false);
     const router = useRouter();
 
-    const handleSubmit = async () => {
-        try {
-            const res = await fetch('/api/generate', {
-                method: 'POST', 
-                headers: {
-                    'Content-Type': 'text/plain'
-                },
-                body: text,
-            });
+    const handleSubmit = () => {
+        fetch('/api/generate', {
+            method: 'POST', 
+            headers: {
+                'Content-Type': 'text/plain'
+            },
+            body: text,
+        })
+        .then((res) => {
             if (!res.ok) {
-                throw new Error("Failed to generate flashcards");
+              throw new Error("Failed to generate flashcards");
             }
-            const data = await res.json();
-            setFlashcards(data.flashcards || []); // Ensure flashcards is always an array
-        } catch (error) {
+            return res.json();
+          })
+          .then((data) => {
+            console.log("API response data:", data);
+            setFlashcards(data || []); // Ensure flashcards is always an array
+            console.log("Updated flashcards state:", data || []); // Additional log for state update
+          })
+          .catch((error) => {
             console.error("Error generating flashcards:", error);
-        }
-    }
+          });
+        };
 
     const handleCardClick = id => {
         setFlipped(prev => ({
@@ -189,4 +194,3 @@ export default function Generate() {
         </Container>
     );
 }
-
