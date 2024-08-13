@@ -2,6 +2,7 @@ import Image from "next/image";
 import getStripe from "@/utils/get-stripe";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
 import { AppBar, Container, Toolbar, Typography, Button, Box, Grid } from "@mui/material";
+import Link from 'next/link'; // Correctly import Link from next/link
 import Head from 'next/head';
 
 export default function Home() {
@@ -18,8 +19,12 @@ export default function Home() {
             Flashcard SaaS
           </Typography>
           <SignedOut>
-            <Button color="inherit" href="/sign-in">Login</Button>
-            <Button color="inherit" href="sign-up">Sign Up</Button>
+            <Link href="/sign-in" passHref>
+              <Button color="inherit">Login</Button>
+            </Link>
+            <Link href="/sign-up" passHref>
+              <Button color="inherit">Sign Up</Button>
+            </Link>
           </SignedOut>
           <SignedIn>
             <UserButton />
