@@ -142,7 +142,7 @@ export default function Generate() {
                         <TextField
                             value={text}
                             onChange={(e) => setText(e.target.value)}
-                            label="Enter text"
+                            label="Enter the topic"
                             fullWidth
                             multiline
                             rows={4}
@@ -173,8 +173,10 @@ export default function Generate() {
                                 <TextField
                                     value={customFront}
                                     onChange={(e) => setCustomFront(e.target.value)}
-                                    label="Front"
+                                    label="Enter Front"
                                     fullWidth
+                                    multiline
+                                    rows={4}
                                     variant="outlined"
                                     error={Boolean(customFrontError)}
                                     helperText={customFrontError}
@@ -184,8 +186,10 @@ export default function Generate() {
                                 <TextField
                                     value={customBack}
                                     onChange={(e) => setCustomBack(e.target.value)}
-                                    label="Back"
+                                    label="Enter Back"
                                     fullWidth
+                                    multiline
+                                    rows={4}
                                     variant="outlined"
                                     error={Boolean(customBackError)}
                                     helperText={customBackError}
