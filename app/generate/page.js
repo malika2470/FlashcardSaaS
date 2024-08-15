@@ -5,13 +5,14 @@ import { useRouter } from 'next/navigation'
 import { useUser } from '@clerk/nextjs'
 import { db } from '@/firebase'
 import { getDoc, doc, collection, writeBatch } from 'firebase/firestore'
+
 import {
     TextField, Container, Box, Typography, Paper, Button,
     Grid, Card, CardActionArea, CardContent, Dialog,
     DialogTitle, DialogContent, DialogContentText,
     DialogActions, AppBar, Tabs, Tab
 } from '@mui/material'
-
+import Link from 'next/link';
 export default function Generate() {
     const { isLoaded, isSignedIn, user } = useUser();
     const [flashcards, setFlashcards] = useState([]);

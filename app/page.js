@@ -71,9 +71,11 @@ export default function Home() {
       <Box sx={{ textAlign: "center", my: 4 }}>
         <Typography variant="h5" gutterBottom>Welcome to Flashcard SaaS</Typography>
         <Typography variant="h6">The easiest way to make flashcards from text</Typography>
-        <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
-          Get Started
-        </Button>
+        <Link href="/generate">
+          <Button variant="contained" color="primary" sx={{ mt: 2, mr: 2 }}>
+            Get Started
+          </Button>
+        </Link>
       </Box>
 
       <Box sx={{ my: 6 }}>
