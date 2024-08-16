@@ -12,7 +12,8 @@ import {
     DialogTitle, DialogContent, DialogContentText,
     DialogActions, AppBar, Tabs, Tab
 } from '@mui/material'
-import Link from 'next/link';
+import LoadingButton from '@mui/lab/LoadingButton';
+
 export default function Generate() {
     const { isLoaded, isSignedIn, user } = useUser();
     const [flashcards, setFlashcards] = useState([]);
@@ -28,6 +29,7 @@ export default function Generate() {
     const [customFrontError, setCustomFrontError] = useState('');
     const [customBackError, setCustomBackError] = useState('');
     const router = useRouter();
+    const [loading, setLoading] = useState(false);
 
     const handleTabChange = (_, newValue) => {
         setTab(newValue);
@@ -37,6 +39,8 @@ export default function Generate() {
         if (!text.trim()) {
             setTextError('Please enter text to generate flashcards.');
             return;
+        } else {
+            setLoading(true);
         }
         setTextError('');
 
@@ -58,6 +62,9 @@ export default function Generate() {
             })
             .catch((error) => {
                 console.error("Error generating flashcards:", error);
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -152,7 +159,9 @@ export default function Generate() {
                             helperText={textError}
                             sx={{ mb: 2 }}
                         />
-                        <Button
+                        <LoadingButton
+                            loading={loading}
+                            loadingIndicator="Loading..."
                             variant='contained'
                             color='primary'
                             onClick={handleSubmit}
@@ -160,7 +169,7 @@ export default function Generate() {
                             sx={{ backgroundColor: 'blue', '&:hover': { backgroundColor: 'darkblue' } }}
                         >
                             Generate
-                        </Button>
+                        </LoadingButton>
                     </Paper>
                 </Box>
             )}
