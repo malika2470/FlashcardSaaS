@@ -135,7 +135,7 @@ export default function Generate() {
     };
 
     return (
-        <Container maxWidth="md" sx={{ mt: 4 }}>
+        <Container maxWidth="md" sx={{ mt: 4, minHeight: "100%vh" }}>
             <AppBar position="static" sx={{ backgroundColor: 'white', borderRadius: 1 }}>
                 <Tabs value={tab} onChange={handleTabChange} centered>
                     <Tab label="AI-Generated Flashcards" />
@@ -176,7 +176,7 @@ export default function Generate() {
 
             {tab === 1 && (
                 <Box sx={{ mt: 4, mb: 6 }}>
-                    <Typography variant="h4" sx={{ color: 'black', mb: 4 }}>Create Custom Flashcards</Typography>
+                    <Typography variant="h4" align="center" sx={{ color: 'black', mb: 4 }}>Create Custom Flashcards</Typography>
                     <Paper sx={{ p: 4, backgroundColor: 'white', boxShadow: 3 }}>
                         <Grid container spacing={2}>
                             <Grid item xs={12} sm={6}>

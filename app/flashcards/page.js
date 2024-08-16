@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { collection, doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from '@/firebase' // Ensure the correct path to your firebase config
 import { useRouter } from 'next/navigation'
-import { Container, Grid, Card, CardActionArea, CardContent, Typography } from '@mui/material'
+import { Container, Grid, Card, CardActionArea, CardContent, Typography, Button } from '@mui/material'
 
 export default function Flashcards() {
     const { isLoaded, isSignedIn, user } = useUser()
@@ -39,7 +39,12 @@ export default function Flashcards() {
     }
 
     return (
-        <Container maxWidth="100vw">
+        <Container maxWidth="100vw"
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            style={{ minHeight: '100vh' }}>
+            <Typography variant='h4' align='center'>Saved Flashcards</Typography>
             <Grid container spacing={3} sx={{ mt: 4 }}>
                 {flashcards.length > 0 ? (
                     flashcards.map((flashcard, index) => (

@@ -2,7 +2,7 @@
 import Image from "next/image";
 import getStripe from "@/utils/get-stripe";
 import { SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-import { AppBar, Container, Toolbar, Typography, Button, Box, Grid, CircularProgress } from "@mui/material";
+import { AppBar, Container, Toolbar, Typography, Button, Box, Grid, CircularProgress, Paper } from "@mui/material";
 import Link from 'next/link';
 import Head from 'next/head';
 
@@ -36,7 +36,17 @@ export default function Home() {
       console.error('Error:', error.message);
     }
   };
-  
+
+  const style = {
+    p: 3,
+    border: "1px solid",
+    borderColor: "grey.300",
+    borderRadius: 2,
+    background: 'white',
+    boxShadow: '2',
+    borderRadius: '15px',
+  }
+
   return (
     <Container maxWidth="lg">
       <Head>
@@ -73,39 +83,34 @@ export default function Home() {
         </Link>
       </Box>
 
-      <Box sx={{ my: 6 }}>
-        <Typography variant="h4" component="h2" gutterBottom>
+      <Box sx={{ my: 6, textAlign: "justify" }}>
+        <Typography variant="h4" component="h2" align="center" gutterBottom>
           Featured
         </Typography>
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
-            <Typography variant="h5">Smart Flashcards</Typography>
-            <Typography>
-              Our AI intelligently breaks down your text into concise flashcards.
-            </Typography>
+            <Paper sx={style}>
+              <Typography variant="h5">Smart Flashcards</Typography>
+              <Typography>
+                Our AI intelligently breaks down your text into concise flashcards.
+              </Typography>
+            </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Typography variant="h5" gutterBottom>Basic</Typography>
-            <Typography variant="h6">$5 / month</Typography>
-            <Typography>
-              Access to basic flashcard features and limited storage.
-            </Typography>
-            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
-              Choose Basic
-            </Button>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <Box sx={{
-              p: 3,
-              border: "1px solid",
-              borderColor: "grey.300",
-              borderRadius: 2,
-            }}>
+            <Paper sx={style}>
               <Typography variant="h5">Easy Text Input</Typography>
               <Typography>
                 Simply input your text and let our software do the rest. Creating flashcards has never been easier.
               </Typography>
-            </Box>
+            </Paper>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <Paper sx={style}>
+              <Typography variant="h5" gutterBottom>Custom Plan</Typography>
+              <Typography>
+                Tailor-made plans to fit your specific needs and preferences.
+              </Typography>
+            </Paper>
           </Grid>
         </Grid>
       </Box>
@@ -114,23 +119,33 @@ export default function Home() {
         <Typography variant="h4" gutterBottom>Pricing</Typography>
         <Grid container spacing={4}>
           <Grid item xs={12} md={4}>
-            <Typography variant="h5" gutterBottom>Smart Flashcards</Typography>
-            <Typography>
-              Our AI intelligently breaks down your text into concise flashcards.
-            </Typography>
+            <Paper sx={style}>
+              <Typography variant="h5" gutterBottom>Basic</Typography>
+              <Typography variant="h6">$5 / month</Typography>
+              <Typography>
+                Access to basic flashcard features and limited storage.
+              </Typography>
+              <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
+                Choose Basic
+              </Button>
+            </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Typography variant="h5" gutterBottom>Pro</Typography>
-            <Typography variant="h6">$10 per month</Typography>
-            <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
-              Choose Pro
-            </Button>
+            <Paper sx={style}>
+              <Typography variant="h5" gutterBottom>Pro</Typography>
+              <Typography variant="h6">$10 per month</Typography>
+              <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={handleSubmit}>
+                Choose Pro
+              </Button>
+            </Paper>
           </Grid>
           <Grid item xs={12} md={4}>
-            <Typography variant="h5" gutterBottom>Custom Plan</Typography>
-            <Typography>
-              Tailor-made plans to fit your specific needs and preferences.
-            </Typography>
+            <Paper sx={style}>
+              <Typography variant="h5" gutterBottom>Free</Typography>
+              <Typography>
+                Create your own flashcards with limited storage. Try out AI feature.
+              </Typography>
+            </Paper>
           </Grid>
         </Grid>
       </Box>
