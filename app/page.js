@@ -16,32 +16,27 @@ export default function Home() {
           'Content-Type': 'application/json',
         }
       });
-
+  
       if (!checkoutSession.ok) {
         const errorResponse = await checkoutSession.text();
         throw new Error(errorResponse || 'Something went wrong with the API request');
       }
-
+  
       const checkoutSessionJson = await checkoutSession.json();
-
+  
       if (checkoutSessionJson.statuscode === 500) {
         console.error(checkoutSessionJson.message);
         return;
       }
-
-      const stripe = await getStripe();
-      const { error } = await stripe.redirectToCheckout({
-        sessionId: checkoutSessionJson.id,
-      });
-
-      if (error) {
-        console.warn(error.message);
-      }
+  
+      // Redirect to the Stripe Checkout page
+      window.location.href = checkoutSessionJson.url;
+  
     } catch (error) {
       console.error('Error:', error.message);
     }
   };
-
+  
   return (
     <Container maxWidth="lg">
       <Head>

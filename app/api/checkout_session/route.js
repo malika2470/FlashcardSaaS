@@ -5,7 +5,11 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(req) {
   try {
-    const { origin } = req.headers;
+    const referer = req.headers.get('referer');
+    const origin = referer ? new URL(referer).origin : 'http://localhost:3000'; // Default to localhost for development
+    
+
+
     const formatAmountForStripe = (amount) => Math.round(amount * 100);
 
     const params = {
@@ -18,7 +22,7 @@ export async function POST(req) {
             product_data: {
               name: "Pro Subscription",
             },
-            unit_amount: formatAmountForStripe(10),
+            unit_amount: formatAmountForStripe(10), // $10 in cents
             recurring: {
               interval: "month",
               interval_count: 1,
@@ -32,8 +36,10 @@ export async function POST(req) {
     };
 
     const checkoutSession = await stripe.checkout.sessions.create(params);
+    console.log('Checkout session created:', checkoutSession);  // Debugging log
     return NextResponse.json(checkoutSession, { status: 200 });
   } catch (error) {
+    console.error('Error creating Stripe checkout session:', error);  // Detailed error log
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }

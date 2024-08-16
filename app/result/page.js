@@ -17,11 +17,13 @@ const ResultPage = () => {
   useEffect(() => {
     const fetchCheckoutSession = async () => {
       if (!session_id) return;
-
+  
       try {
         const res = await fetch(`/api/checkout_session?session_id=${session_id}`);
         const sessionData = await res.json();
-
+  
+        console.log('Fetched session data:', sessionData); // Debug log
+  
         if (res.ok) {
           setSession(sessionData);
         } else {
@@ -33,10 +35,10 @@ const ResultPage = () => {
         setLoading(false);
       }
     };
-
+  
     fetchCheckoutSession();
   }, [session_id]);
-
+  
   if (loading) {
     return (
       <Container maxWidth="100vw" sx={{ textAlign: 'center', mt: 4 }}>
