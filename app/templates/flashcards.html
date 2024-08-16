@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flashcards Preview</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f5f5f5;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        padding: 20px;
+        margin: 0;
+      }
+
+      .flashcards-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+        width: 80%;
+        max-width: 1200px;
+        margin-bottom: 20px;
+      }
+
+      .flashcard {
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        cursor: pointer;
+        height: 200px;
+        perspective: 1000px;
+        position: relative;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+      }
+
+      .flashcard.flip {
+        transform: rotateY(180deg);
+      }
+
+      .flashcard .front,
+      .flashcard .back {
+        backface-visibility: hidden;
+        border-radius: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100%;
+        padding: 20px;
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+      }
+
+      .flashcard .front {
+        background-color: #007bff;
+        color: white;
+        font-size: 1.2em;
+      }
+
+      .flashcard .back {
+        background-color: #f8f9fa;
+        color: #333;
+        font-size: 1em;
+        transform: rotateY(180deg); 
+        overflow-y: auto;
+        text-align: center;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .flashcard .edit-btn {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 5px 10px;
+        cursor: pointer;
+      }
+
+      .save-btn {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 1em;
+      }
+
+      .save-btn:hover {
+        background-color: #0056b3;
+      }
+
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 100;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+
+      .modal-content {
+        background-color: white;
+        margin: 10% auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 500px;
+        border-radius: 10px;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      #set-name {
+        margin-bottom: 10px;
+        width: 100%;
+        padding: 10px;
+        font-size: 1em;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Flashcards Preview</h1>
+    <div class="flashcards-container" id="flashcards-container">
+    </div>
+
+    <input type="text" id="set-name" placeholder="Enter flashcard set name" />
+    <button class="save-btn" onclick="saveFlashcards()">
+      Save Flashcards to Firebase
+    </button>
+
+    <!-- Edit Modal -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Edit Flashcard</h2>
+        <form id="editForm">
+          <label for="editFront">Question:</label><br />
+          <input
+            type="text"
+            id="editFront"
+            name="front"
+            style="width: 100%; padding: 8px"
+          /><br /><br />
+          <label for="editBack">Answer:</label><br />
+          <textarea
+            id="editBack"
+            name="back"
+            rows="5"
+            style="width: 100%; padding: 8px"
+          ></textarea
+          ><br /><br />
+          <button type="submit" style="padding: 10px 15px">Save</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      let flashcardsData = {{ flashcards | tojson | safe }};
+      let currentFlashcard = null;
+
+      const flashcardsContainer = document.getElementById('flashcards-container');
+      const editModal = document.getElementById("editModal");
+      const editForm = document.getElementById("editForm");
+
+      function createFlashcard(flashcard, index) {
+        const card = document.createElement('div');
+        card.classList.add('flashcard');
+
+        const front = flashcard.front || 'No question provided';
+        const back = flashcard.back || 'No answer provided';
+
+        card.innerHTML = `
+          <div class="front">${front}</div>
+          <div class="back">${back}</div>
+          <button class="edit-btn" onclick="openEditModal(${index})">Edit</button>
+        `;
+
+        card.addEventListener('click', (e) => {
+          if (e.target.classList.contains('edit-btn')) {
+            return; // prevent flipping when clicking the edit button
+          }
+          card.classList.toggle('flip');
+        });
+
+        flashcardsContainer.appendChild(card);
+      }
+
+      flashcardsData.flashcards.forEach(createFlashcard);
+
+      function openEditModal(index) {
+        currentFlashcard = index;
+        document.getElementById("editFront").value = flashcardsData.flashcards[index].front;
+        document.getElementById("editBack").value = flashcardsData.flashcards[index].back;
+        editModal.style.display = "block";
+      }
+
+      function closeModal() {
+        editModal.style.display = "none";
+      }
+
+      editForm.onsubmit = function(event) {
+        event.preventDefault();
+        if (currentFlashcard !== null) {
+          flashcardsData.flashcards[currentFlashcard].front = document.getElementById("editFront").value;
+          flashcardsData.flashcards[currentFlashcard].back = document.getElementById("editBack").value;
+          flashcardsContainer.innerHTML = ''; // Clear the container
+          flashcardsData.flashcards.forEach(createFlashcard); // Re-render flashcards
+          closeModal();
+        }
+      };
+
+      const saveFlashcards = async () => {
+        const setName = document.getElementById('set-name').value;
+        if (!setName.trim()) {
+          alert('Please enter a name for your flashcard set.');
+          return;
+        }
+
+        try {
+          const userDocRef = doc(collection(db, 'users'), user.id);
+          const userDocSnap = await getDoc(userDocRef);
+
+          const batch = writeBatch(db);
+
+          if (userDocSnap.exists()) {
+            const userData = userDocSnap.data();
+            const updatedSets = [...(userData.flashcardSets || []), { name: setName }];
+            batch.update(userDocRef, { flashcardSets: updatedSets });
+          } else {
+            batch.set(userDocRef, { flashcardSets: [{ name: setName }] });
+          }
+
+          const setDocRef = doc(collection(userDocRef, 'flashcardSets'), setName);
+          batch.set(setDocRef, { flashcards: flashcardsData.flashcards });
+
+          await batch.commit();
+
+          alert('Flashcards saved successfully!');
+        } catch (error) {
+          console.error('Error saving flashcards:', error);
+          alert('An error occurred while saving flashcards. Please try again.');
+        }
+      };
+    </script>
+  </body>
+</html>
