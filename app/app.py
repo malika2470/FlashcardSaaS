@@ -1,19 +1,20 @@
+import json
+import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify, render_template
 import requests
 from bs4 import BeautifulSoup
 import openai
-from dotenv import load_dotenv
-import os
-import json
 
-# Load environment variables from .env file
-load_dotenv()
+# Load environment variables from .env.local
+load_dotenv(dotenv_path='.env.local')
 
-# Set OpenAI API key
-openai.api_key = os.getenv('OPENAI_API_KEY')
-if not openai.api_key:
+openai.api_key = (
+    "OPEN_API")
+
+if openai.api_key is None:
     raise ValueError(
-        "OpenAI API key is missing. Please set the API key in the .env file.")
+        "OpenAI API key not found. Please check your .env.local file.")
 
 app = Flask(__name__)
 
@@ -23,35 +24,37 @@ def home():
     return render_template('index.html')
 
 
-@app.route('/generate-flashcards', methods=['POST'])
+@app.route('/generate-flashcards')
 def generate_flashcards():
-    data = request.form  # Use form data from the frontend
-    url = data.get('url')
+    url = request.args.get('url')
+
+    if not url:
+        return jsonify({"error": "No URL provided"}), 400
 
     try:
-        # Step 1: Fetch the content of the URL
+        # Fetch the content of the URL
         response = requests.get(url)
-        response.raise_for_status()  # Check for request errors
+        response.raise_for_status()
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        # Step 2: Extract relevant text content
+        # Extract relevant text content
         paragraphs = [p.get_text() for p in soup.find_all('p')]
         content = "\n\n".join(paragraphs)
 
-        # Step 3: Send the extracted text to OpenAI API for flashcard generation
+        # Generate flashcards using OpenAI API
         messages = [
             {"role": "system", "content": "You are a flashcard creator."},
             {"role": "user", "content": f"""Take the following text and create exactly 10 flashcards from it.
-Both the front and back of the flashcards should be one sentence long the. the front should be a question and the back should be the answer.
-Return the flashcards in the following JSON format:
-{{
-  "flashcards": [
-    {{
-      "front": "Front of the card",
-      "back": "Back of the card"
-    }}
-  ]
-}}:\n\n{content}"""}
+            Both the front and back of the flashcards should be one sentence long. The front should be a question, and the back should be the answer.
+            Return the flashcards in the following JSON format:
+            {{
+              "flashcards": [
+                {{
+                  "front": "Front of the card",
+                  "back": "Back of the card"
+                }}
+              ]
+            }}:\n\n{content}"""}
         ]
 
         openai_response = openai.ChatCompletion.create(
@@ -63,22 +66,15 @@ Return the flashcards in the following JSON format:
             temperature=0.5
         )
 
-        # Step 4: Process the generated flashcards
         raw_flashcards = openai_response.choices[0].message['content'].strip()
-
-        # Convert the raw response to a JSON object
         flashcards_json = json.loads(raw_flashcards)
 
-        # Debugging: Print the flashcards data to ensure correctness
-        print(f"Generated Flashcards: {flashcards_json}")
+        print("Generated Flashcards:", flashcards_json)
 
         return render_template('flashcards.html', flashcards=flashcards_json)
 
-    except json.JSONDecodeError as e:
-        return jsonify({"error": f"Error decoding JSON from OpenAI response: {str(e)}"}), 500
-    except requests.RequestException as e:
-        return jsonify({"error": f"Error fetching the URL: {str(e)}"}), 500
     except Exception as e:
+        print(f"An error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
