@@ -21,7 +21,7 @@ export default function SignInPage() {
         >
             <CssBaseline />
 
-            <AppBar position="static" sx={{ backgroundColor: '#3F51B5', boxShadow: 'none' }}>
+            <AppBar position="static" sx={{ backgroundColor: '#3F51B5', boxShadow: 'none', width: '100%' }}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1, fontFamily: 'Roboto, sans-serif' }}>
                         FlipSmart
@@ -49,7 +49,7 @@ export default function SignInPage() {
                 flexDirection="column"
                 justifyContent="center"
                 alignItems="center"
-                sx={{ mt: 8, flexGrow: 1 }}
+                sx={{ mt: 8, flexGrow: 1, width: '100%' }}
             >
                 <Typography variant="h4" sx={{ color: '#3F51B5', mb: 4, fontFamily: "'Lato', sans-serif" }}>
                     Sign In
@@ -62,6 +62,8 @@ export default function SignInPage() {
                         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
                         width: '100%',
                         maxWidth: '400px',
+                        display: 'flex',
+                        justifyContent: 'center',  // Center the SignIn component horizontally
                     }}
                 >
                     <SignIn afterSignInUrl="/free-dashboard" /> {/* Ensure this redirects to the correct page */}
