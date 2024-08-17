@@ -1,11 +1,28 @@
+'use client';
+
 import { AppBar, Typography, Container, Button, Toolbar, Box } from '@mui/material';
-import Link from 'next/link'; // Correctly import Link from next/link
-import { SignUp } from '@clerk/nextjs'; // Importing Clerk's SignUp component
+import Link from 'next/link';
+import { SignUp, useSignUp } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function SignUpPage() {
+    const router = useRouter();
+    const { isLoaded, signUp } = useSignUp();
+
+    useEffect(() => {
+        if (isLoaded && signUp) {
+            // Check if the sign-up is completed successfully
+            if (signUp.status === 'complete') {
+                // Redirect to the Free Dashboard
+                router.push('/free-dashboard');
+            }
+        }
+    }, [isLoaded, signUp, router]);
+
     return (
         <Container 
-            maxWidth="false" 
+            maxWidth={false} 
             disableGutters 
             sx={{ 
                 minHeight: '100vh', 
@@ -44,7 +61,12 @@ export default function SignUpPage() {
                         boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)' 
                     }}
                 >
-                    <SignUp />
+                    <SignUp 
+                        path="/sign-up"
+                        routing="path"
+                        signInUrl="/sign-in"
+                        afterSignUpUrl="/free-dashboard"  // Redirects to the Free Dashboard
+                    />
                 </Box>
             </Box>
         </Container>
