@@ -50,7 +50,7 @@ export default function PlanSelectionPage() {
             <AppBar position="static" sx={{ backgroundColor: '#D5D4E5', boxShadow: 'none' }}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1, color: '#000', fontFamily: 'Roboto, sans-serif', fontWeight: 'bold' }}>
-                        Flashcard SaaS
+                
                     </Typography>
                 </Toolbar>
             </AppBar>

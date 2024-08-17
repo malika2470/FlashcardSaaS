@@ -201,7 +201,7 @@ export default function Home() {
         }}
       >
         <Typography variant="body2">
-          © 2024 FlipSmart. All rights reserved.
+          Â© 2024 FlipSmart. All rights reserved.
         </Typography>
       </Box>
     </Container>
