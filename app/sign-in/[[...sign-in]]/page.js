@@ -1,6 +1,7 @@
+'use client';
 import { AppBar, Typography, Container, Button, Toolbar, Box } from '@mui/material';
-import Link from 'next/link'; // Correctly import Link from next/link
-import { SignIn } from '@clerk/nextjs'; // Importing Clerk's SignIn component
+import Link from 'next/link'; // Import Link from next/link
+import { SignIn } from '@clerk/nextjs'; // Import Clerk's SignIn component
 
 export default function SignInPage() {
     return (
@@ -23,7 +24,7 @@ export default function SignInPage() {
                 sx={{ mt: 8 }}
             >
                 <Typography variant="h4">Sign In</Typography>
-                <SignIn />
+                <SignIn /> {/* Removed redirectUrl to prevent automatic redirection */}
             </Box>
         </Container>
     );

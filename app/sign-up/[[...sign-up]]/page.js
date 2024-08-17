@@ -1,6 +1,7 @@
+'use client';
 import { AppBar, Typography, Container, Button, Toolbar, Box } from '@mui/material';
-import Link from 'next/link'; // Correctly import Link from next/link
-import { SignUp } from '@clerk/nextjs'; // Importing Clerk's SignUp component
+import Link from 'next/link'; // Import Link from next/link
+import { SignUp } from '@clerk/nextjs'; // Import Clerk's SignUp component
 
 export default function SignUpPage() {
     return (
@@ -11,7 +12,7 @@ export default function SignUpPage() {
                         Flashcard SaaS
                     </Typography>
                     <Link href="/sign-in" passHref>
-                        <Button color="inherit">Login</Button>
+                        <Button color="inherit">Sign In</Button>
                     </Link>
                 </Toolbar>
             </AppBar>
@@ -23,7 +24,7 @@ export default function SignUpPage() {
                 sx={{ mt: 8 }}
             >
                 <Typography variant="h4">Sign Up</Typography>
-                <SignUp />
+           
             </Box>
         </Container>
     );
