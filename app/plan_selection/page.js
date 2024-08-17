@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import { Container, Typography, Box, Button, Grid, List, ListItem, ListItemText, AppBar, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { loadStripe } from '@stripe/stripe-js';
@@ -8,8 +9,9 @@ export default function PlanSelectionPage() {
     const router = useRouter();
 
     const handleSelectFree = () => {
-        router.push('/sign-up');
+        router.push('/sign-up');  
     };
+    
     
     const handleSelectPro = async () => {
         try {
@@ -43,7 +45,6 @@ export default function PlanSelectionPage() {
             console.error('Error during Stripe checkout:', error);
         }
     };
-    
 
     return (
         <div style={{ backgroundColor: '#D5D4E5', minHeight: '100vh', margin: 0, padding: 0 }}>
