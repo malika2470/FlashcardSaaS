@@ -134,7 +134,6 @@ export default function DisplayFlashcardSets() {
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Name</Typography>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Date Created</Typography>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Study</Typography>
-                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Quiz</Typography>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Edit</Typography>
                 </Box>
 
@@ -165,25 +164,6 @@ export default function DisplayFlashcardSets() {
                                     onClick={() => router.push(`/flashcards_manager/study/${set.id}`)}
                                 >
                                     Study
-                                </Button>
-                            </Box>
-                            <Box sx={{ flex: 1, textAlign: 'center' }}>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    sx={{
-                                        fontFamily: "'Lato', sans-serif",
-                                        backgroundColor: '#42A5F5',
-                                        '&:hover': { backgroundColor: '#1E88E5' },
-                                        transition: 'transform 0.2s ease-in-out',
-                                        '&:hover': {
-                                            transform: 'scale(1.05)',
-                                            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                                        }
-                                    }}
-                                    onClick={() => alert('Quiz Mode not implemented yet')}
-                                >
-                                    Quiz
                                 </Button>
                             </Box>
                             <Box sx={{ flex: 1, textAlign: 'center' }}>
