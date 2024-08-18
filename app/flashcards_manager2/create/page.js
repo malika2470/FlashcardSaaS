@@ -8,7 +8,8 @@ import { db } from '../../../firebase';
 import { useUser } from '@clerk/nextjs';
 import {
     Container, Typography, Box, TextField, Button,
-    Card, CardContent, Grid, IconButton, AppBar, Toolbar
+    Card, CardContent, Grid, IconButton, AppBar, Toolbar,
+    Dialog, DialogTitle, DialogContent, DialogActions
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { UserButton } from '@clerk/nextjs';
@@ -18,6 +19,8 @@ export default function CreateFlashcards() {
     const [newFlashcards, setNewFlashcards] = useState([{ front: '', back: '' }]);
     const [flipped, setFlipped] = useState({});
     const [loading, setLoading] = useState(false);
+    const [open, setOpen] = useState(false);  // State to manage the dialog
+    const [url, setUrl] = useState('');  // State to manage the URL input
     const router = useRouter();
     const { user } = useUser();
 
@@ -76,6 +79,21 @@ export default function CreateFlashcards() {
         }
     };
 
+    const handleOpenDialog = () => {
+        setOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setOpen(false);
+    };
+
+    const handleUrlSubmit = () => {
+        // Handle URL submission and generate flashcards based on the URL content
+        alert(`Flashcards generated from URL: ${url}`);
+        setUrl('');
+        setOpen(false);
+    };
+
     return (
         <Box sx={{ minHeight: '100vh', backgroundColor: '#E3F2FD' }}>
             <AppBar position="static" sx={{ backgroundColor: '#3F51B5', boxShadow: 'none', mb: 4 }}>
@@ -95,7 +113,7 @@ export default function CreateFlashcards() {
                 <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Lato, sans-serif', color: '#3F51B5', fontWeight: 'bold', textAlign: 'center' }}>
                     Create New Flashcard Set
                 </Typography>
-                <Box sx={{ mt: 2 }}>
+                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
                     <TextField
                         label="Collection Name"
                         variant="outlined"
@@ -104,67 +122,85 @@ export default function CreateFlashcards() {
                         onChange={(e) => setName(e.target.value)}
                         sx={{ mb: 2, borderRadius: '8px' }}
                     />
-                    <Grid container spacing={2}>
-                        {newFlashcards.map((flashcard, index) => (
-                            <Grid item xs={12} sm={6} key={index}>
-                                <Card sx={{ mb: 2, borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
-                                    <CardContent>
-                                        <TextField
-                                            label="Front"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={flashcard.front}
-                                            onChange={(e) => handleFrontChange(index, e)}
-                                            sx={{ mb: 1, borderRadius: '8px' }}
-                                        />
-                                        <TextField
-                                            label="Back"
-                                            variant="outlined"
-                                            fullWidth
-                                            value={flashcard.back}
-                                            onChange={(e) => handleBackChange(index, e)}
-                                            sx={{ mb: 1, borderRadius: '8px' }}
-                                        />
-                                        <IconButton onClick={() => handleRemoveFlashcard(index)} sx={{ color: '#E57373' }}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                        ))}
-                    </Grid>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
-                        <Button
-                            variant="contained"
-                            onClick={handleAddFlashcard}
-                            sx={{
-                                backgroundColor: '#5C6BC0',
-                                '&:hover': { backgroundColor: '#3F51B5' },
-                                borderRadius: '8px',
-                                transition: 'transform 0.3s ease',
-                                '&:hover': {
-                                    transform: 'scale(1.05)',
-                                },
-                            }}
-                        >
-                            Add Flashcard
-                        </Button>
-                        <Button
-                            variant="contained"
-                            onClick={saveFlashcards}
-                            sx={{
-                                backgroundColor: '#42A5F5',
-                                '&:hover': { backgroundColor: '#1E88E5' },
-                                borderRadius: '8px',
-                                transition: 'transform 0.3s ease',
-                                '&:hover': {
-                                    transform: 'scale(1.05)',
-                                },
-                            }}
-                        >
-                            Save Flashcards
-                        </Button>
-                    </Box>
+                    <Button
+                        variant="contained"
+                        onClick={handleOpenDialog}
+                        sx={{
+                            backgroundColor: '#42A5F5',
+                            '&:hover': { backgroundColor: '#1E88E5' },
+                            borderRadius: '8px',
+                            ml: 2,
+                            height: 'fit-content',
+                            alignSelf: 'flex-end',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                    >
+                        Generate from URL
+                    </Button>
+                </Box>
+                <Grid container spacing={2}>
+                    {newFlashcards.map((flashcard, index) => (
+                        <Grid item xs={12} sm={6} key={index}>
+                            <Card sx={{ mb: 2, borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+                                <CardContent>
+                                    <TextField
+                                        label="Front"
+                                        variant="outlined"
+                                        fullWidth
+                                        value={flashcard.front}
+                                        onChange={(e) => handleFrontChange(index, e)}
+                                        sx={{ mb: 1, borderRadius: '8px' }}
+                                    />
+                                    <TextField
+                                        label="Back"
+                                        variant="outlined"
+                                        fullWidth
+                                        value={flashcard.back}
+                                        onChange={(e) => handleBackChange(index, e)}
+                                        sx={{ mb: 1, borderRadius: '8px' }}
+                                    />
+                                    <IconButton onClick={() => handleRemoveFlashcard(index)} sx={{ color: '#E57373' }}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </CardContent>
+                            </Card>
+                        </Grid>
+                    ))}
+                </Grid>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleAddFlashcard}
+                        sx={{
+                            backgroundColor: '#5C6BC0',
+                            '&:hover': { backgroundColor: '#3F51B5' },
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                    >
+                        Add Flashcard
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={saveFlashcards}
+                        sx={{
+                            backgroundColor: '#42A5F5',
+                            '&:hover': { backgroundColor: '#1E88E5' },
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                    >
+                        Save Flashcards
+                    </Button>
                 </Box>
 
                 {(newFlashcards.length > 0) && (
@@ -259,6 +295,31 @@ export default function CreateFlashcards() {
                     </Box>
                 )}
             </Container>
+
+            {/* Dialog for URL input */}
+            <Dialog open={open} onClose={handleCloseDialog}>
+                <DialogTitle>Generate Flashcards from URL</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Paste URL here"
+                        type="url"
+                        fullWidth
+                        variant="outlined"
+                        value={url}
+                        onChange={(e) => setUrl(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} sx={{ color: '#3F51B5' }}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleUrlSubmit} sx={{ color: '#3F51B5' }}>
+                        Generate
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 }
