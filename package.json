@@ -12,17 +12,21 @@
     "@clerk/nextjs": "^5.3.1",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
     "@mui/lab": "^5.0.0-alpha.173",
     "@mui/material": "^5.16.7",
     "@splinetool/react-spline": "^4.0.0",
     "@stripe/stripe-js": "^4.2.0",
     "firebase": "^10.13.0",
     "next": "14.2.5",
-    "openai": "^4.55.5",
+    "openai": "^4.56.0",
     "react": "^18.3.1",
     "react-dom": "^18",
+    "react-swipeable": "^7.0.1",
     "react-tilt": "^1.0.2",
-    "stripe": "^16.7.0"
+    "stripe": "^16.8.0",
+    "swiper": "^11.1.9",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "22.4.0",
