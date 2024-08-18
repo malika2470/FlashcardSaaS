@@ -67,7 +67,7 @@ export default function SignInPage() {
                         justifyContent: 'center',  // Center the SignIn component horizontally
                     }}
                 >
-                    <SignIn afterSignInUrl="/free-dashboard" /> {/* Ensure this redirects to the correct page */}
+                    <SignIn afterSignInUrl="/flashcards_manager/view" /> {/* Ensure this redirects to the correct page */}
                 </Box>
             </Box>
         </Container>
