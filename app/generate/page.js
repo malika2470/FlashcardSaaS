@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import { db } from '../../firebase';
-import { getDoc, doc, collection, writeBatch } from 'firebase/firestore';
+import { getDoc, doc, collection, writeBatch, setDoc, arrayUnion} from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid'; 
 import {
     TextField, Container, Box, Typography, Paper, Button,
     Grid, Card, CardActionArea, CardContent, Dialog,
@@ -80,30 +81,29 @@ export default function Generate() {
             alert("Please enter a name");
             return;
         }
-
-        const batch = writeBatch(db);
-        const userDocRef = doc(collection(db, 'users'), user.id);
-        const docSnap = await getDoc(userDocRef);
-
-        const collections = docSnap.exists() ? docSnap.data().flashcards || [] : [];
-        if (collections.find((f) => f.name === name)) {
-            alert("Flashcard collection with the same name already exists");
-            return;
-        }
-        collections.push({ name });
-        batch.set(userDocRef, { flashcards: collections }, { merge: true });
-
-        const colRef = collection(userDocRef, name);
-        flashcards.forEach((flashcard) => {
-            const cardDocRef = doc(colRef);
-            batch.set(cardDocRef, flashcard);
-        });
-
-        await batch.commit();
+    
+        // Generate a unique ID for the new flashcard set
+        const flashcardSetId = uuidv4();
+    
+        // Include the ID when saving the flashcard set
+        const flashcardsData = {
+            id: flashcardSetId,
+            name,
+            flashcards // This includes all the flashcards generated
+        };
+    
+        const userDocRef = doc(db, 'users', user.id);
+    
+        // Save the flashcard set in the user's document, merging with existing data
+        await setDoc(userDocRef, {
+            flashcards: arrayUnion(flashcardsData) // Add the new set to the user's flashcards array
+        }, { merge: true });
+    
         handleClose();
-        router.push('/flashcards_manager/view');
-    }
-
+        router.push('/flashcards_manager2/view');
+    };
+    
+    
     return (
         <Container maxWidth="md" sx={{ mt: 4, minHeight: "100vh" }}>
             <Box sx={{ mt: 4, mb: 6, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
