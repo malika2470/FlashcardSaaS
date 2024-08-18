@@ -44,7 +44,8 @@ export default function CreateFlashcards() {
         setLoading(true);
         try {
             const flashcardSetId = uuidv4(); // Generate a unique ID for the new flashcard set
-            const flashcardsData = { name, flashcards: newFlashcards };
+            const creationDate = new Date().toISOString(); // Get the current date and time
+            const flashcardsData = { name, flashcards: newFlashcards, creationDate }; // Include the creation date
 
             // Save the flashcard set with its ID
             await setDoc(doc(db, 'flashcard_sets', flashcardSetId), flashcardsData);
