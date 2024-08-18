@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
 
+
 export default function Home() {
 
   const [isFlipped, setIsFlipped] = useState(false);
