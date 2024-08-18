@@ -20,26 +20,35 @@ export default function StudyMode() {
     useEffect(() => {
         async function fetchFlashcardSet() {
             if (!user || !setId) return;
-
+    
             setLoading(true);
             setError(null);
-
+    
             try {
-                const docRef = doc(db, 'flashcard_sets', setId);
-                const docSnap = await getDoc(docRef);
+                // Reference the user's document in Firestore
+                const userDocRef = doc(db, 'users', user.id);
+                const docSnapshot = await getDoc(userDocRef);
 
-                if (docSnap.exists()) {
-                    setFlashcards(docSnap.data().flashcards);
+                if (docSnapshot.exists()) {
+                    const userData = docSnapshot.data();
+                    const flashcardSet = userData.flashcards.find(set => set.id === setId);
+                    
+                    if (flashcardSet) {
+                        setFlashcards(flashcardSet.flashcards);
+                    } else {
+                        setError('Flashcard set not found.');
+                    }
                 } else {
-                    setError('Flashcard set not found.');
+                    setError('User data not found.');
                 }
             } catch (error) {
+                console.error('Error fetching flashcard set:', error);
                 setError('Failed to load flashcard set. Please try again later.');
             } finally {
                 setLoading(false);
             }
         }
-
+    
         if (isLoaded && isSignedIn) {
             fetchFlashcardSet();
         } else {
@@ -47,7 +56,7 @@ export default function StudyMode() {
             setError('You must be signed in to view and study flashcards.');
         }
     }, [user, isLoaded, isSignedIn, setId]);
-
+    
     const handleFlip = () => {
         setFlipped(!flipped);
     };
@@ -55,14 +64,14 @@ export default function StudyMode() {
     const handleNext = () => {
         if (currentCard < flashcards.length - 1) {
             setCurrentCard((prev) => prev + 1);
-            setFlipped(false);  // Reset to front side when moving to the next card
+            setFlipped(false);
         }
     };
 
     const handlePrevious = () => {
         if (currentCard > 0) {
             setCurrentCard((prev) => prev - 1);
-            setFlipped(false);  // Reset to front side when moving to the previous card
+            setFlipped(false);
         }
     };
 
@@ -185,8 +194,8 @@ export default function StudyMode() {
                         }}
                     >
                         {flipped
-                            ? flashcards[currentCard].back
-                            : flashcards[currentCard].front}
+                            ? flashcards[currentCard]?.back
+                            : flashcards[currentCard]?.front}
                     </Typography>
                     <Typography
                         variant="h3"
@@ -199,8 +208,8 @@ export default function StudyMode() {
                         }}
                     >
                         {flipped
-                            ? flashcards[currentCard].front
-                            : flashcards[currentCard].back}
+                            ? flashcards[currentCard]?.front
+                            : flashcards[currentCard]?.back}
                     </Typography>
                 </Box>
             </Box>
