@@ -1,200 +1,218 @@
 'use client';
-import { useEffect, useState } from 'react';
-import { Container, Typography, Button, Grid, Card, CardContent, CardActions } from '@mui/material';
-import { useRouter } from 'next/navigation';
+
+import { useUser } from "@clerk/nextjs";
+import { useEffect, useState } from "react";
 import { collection, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase'; 
+import { db } from '../../firebase';  
+import { Container, Grid, Typography, Box, CircularProgress, Card, CardContent, Button, TextField, AppBar, Toolbar } from '@mui/material';
+import { useRouter } from 'next/navigation';
+import { UserButton } from '@clerk/nextjs';
 
-export default function ProDashboard() {
+export default function DisplayFlashcardSets() {
+    const { isLoaded, isSignedIn, user } = useUser();
+    const [flashcardSets, setFlashcardSets] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const router = useRouter();
-    const [selectedSetId, setSelectedSetId] = useState('');
 
+    // Fetch existing flashcard sets
     useEffect(() => {
-        async function fetchFirstQuizId() {
-            console.log("Fetching first quiz ID...");
+        async function fetchFlashcardSets() {
+            if (!user) return;
+
+            setLoading(true);
+            setError(null);
 
             try {
-                const querySnapshot = await getDocs(collection(db, 'quizzes'));
-                console.log("QuerySnapshot:", querySnapshot);
+                const colRef = collection(db, 'flashcard_sets');
+                const docsSnapshot = await getDocs(colRef);
+                const flashcardSetsData = [];
 
-                if (!querySnapshot.empty) {
-                    const firstQuizId = querySnapshot.docs[0].id;
-                    console.log('First Quiz ID:', firstQuizId);
-                    setSelectedSetId(firstQuizId);
-                } else {
-                    console.log("No quizzes found in the database.");
-                }
+                docsSnapshot.forEach((doc) => {
+                    flashcardSetsData.push({ id: doc.id, ...doc.data() });
+                });
+
+                setFlashcardSets(flashcardSetsData);
             } catch (error) {
-                console.error("Error fetching quiz ID:", error);
+                console.error('Error fetching flashcard sets:', error);
+                setError('Failed to load flashcard sets. Please try again later.');
+            } finally {
+                setLoading(false);
             }
         }
 
-        fetchFirstQuizId();
-    }, []);
+        if (isLoaded && isSignedIn) {
+            fetchFlashcardSets();
+        } else {
+            setLoading(false);
+            setError('You must be signed in to view and manage flashcards.');
+        }
+    }, [user, isLoaded, isSignedIn]);
 
-    console.log("SelectedSetId State:", selectedSetId);
+    const filteredFlashcardSets = flashcardSets.filter(set =>
+        set.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    if (!isLoaded || !isSignedIn) {
+        return (
+            <Container maxWidth="sm">
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <CircularProgress />
+                </Box>
+            </Container>
+        );
+    }
+
+    if (loading) {
+        return (
+            <Container maxWidth="sm">
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+                    <CircularProgress />
+                </Box>
+            </Container>
+        );
+    }
+
+    if (error) {
+        return (
+            <Container maxWidth="sm">
+                <Typography variant="h6" align="center" sx={{ mt: 4, color: 'red' }}>
+                    {error}
+                </Typography>
+            </Container>
+        );
+    }
 
     return (
-        <Container 
-            maxWidth="false" 
-            disableGutters
-            sx={{ 
-                minHeight: '100vh', 
-                backgroundColor: '#E3F2FD', 
-                padding: '20px' 
-            }}>
-            <Typography 
-                variant="h4" 
-                gutterBottom 
-                sx={{ 
-                    fontFamily: 'Roboto, sans-serif', 
-                    fontWeight: 'bold', 
-                    textAlign: 'center', 
-                    color: '#3F51B5' 
-                }}>
-                Welcome to the Pro Dashboard
-            </Typography>
-            <Typography 
-                variant="body1" 
-                sx={{ textAlign: 'center', mb: 4, color: '#5C6BC0' }}>
-                Here you can access all the Pro features!
-            </Typography>
+        <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '2rem' }}>
+            {/* Top App Bar */}
+            <AppBar position="static" sx={{ backgroundColor: '#3f51b5', boxShadow: 'none', padding: '10px 0' }}>
+                <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography
+                        variant="h6"
+                        sx={{ fontWeight: 'bold', fontFamily: "'Lato', sans-serif", cursor: 'pointer' }}
+                        onClick={() => router.push('/flashcards_manager2/view')}
+                    >
+                        FlipSmart
+                    </Typography>
+                    <UserButton />
+                </Toolbar>
+            </AppBar>
 
-            <Grid container spacing={4}>
-                {/* Access Saved Flashcard Sets */}
-                <Grid item xs={12} md={6}>
-                    <Card sx={{ backgroundColor: '#D1C4E9', borderRadius: '8px' }}>
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom sx={{ color: '#3F51B5' }}>
-                                Access Saved Flashcard Sets
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: '#5C6BC0' }}>
-                                View and manage all your previously saved flashcard sets.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button 
-                                size="large" 
-                                variant="contained" 
-                                sx={{ backgroundColor: '#9575CD' }}
-                                onClick={() => router.push('/flashcards_manager2/view')}
-                            >
-                                Go to My Sets
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
+            <Container maxWidth="lg" sx={{ paddingTop: '2rem', paddingBottom: '2rem', backgroundColor: '#FFFFFF', borderRadius: '8px', marginTop: '20px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        sx={{
+                            fontFamily: "'Lato', sans-serif",
+                            backgroundColor: '#66BB6A',
+                            '&:hover': { backgroundColor: '#43A047' },
+                            transition: 'transform 0.2s ease-in-out',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                                boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                            }
+                        }}
+                        onClick={() => router.push('/flashcards_manager2/create')}
+                    >
+                        Create New Flashcard Set
+                    </Button>
+                    <TextField
+                        label="Search Flashcard Sets"
+                        variant="outlined"
+                        fullWidth
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        sx={{ ml: 4, backgroundColor: '#FFFFFF', borderRadius: '8px' }}
+                    />
+                </Box>
 
-                {/* Edit Flashcard Sets */}
-                <Grid item xs={12} md={6}>
-                    <Card sx={{ backgroundColor: '#D1C4E9', borderRadius: '8px' }}>
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom sx={{ color: '#3F51B5' }}>
-                                Edit your previously made flashcard sets
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: '#5C6BC0' }}>
-                                Add or delete your old flashcard sets.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button size="large" variant="contained" sx={{ backgroundColor: '#9575CD' }} onClick={() => router.push('/flashcards_manager2/edit')}>
-                                Edit my sets
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
+                {/* Header for the table */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', backgroundColor: '#3f51b5', color: '#FFFFFF', borderRadius: '8px 8px 0 0' }}>
+                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Name</Typography>
+                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Date Created</Typography>
+                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Study</Typography>
+                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Quiz</Typography>
+                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Edit</Typography>
+                </Box>
 
-                {/* AI Generation of Flashcards */}
-                <Grid item xs={12} md={6}>
-                    <Card sx={{ backgroundColor: '#D1C4E9', borderRadius: '8px' }}>
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom sx={{ color: '#3F51B5' }}>
-                                AI Generation of Flashcards
+                {/* List of Flashcard Sets */}
+                {filteredFlashcardSets.length > 0 ? (
+                    filteredFlashcardSets.map((set) => (
+                        <Card key={set.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '10px', borderRadius: '0 0 8px 8px', backgroundColor: '#f0f0f0', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                            <Typography sx={{ flex: 1, textAlign: 'left', padding: '10px', fontFamily: 'Lato, sans-serif', color: '#3f51b5' }}>
+                                {set.name || 'Unnamed Set'}
                             </Typography>
-                            <Typography variant="body2" sx={{ color: '#5C6BC0' }}>
-                                Automatically generate flashcards with AI and customize them as you wish.
+                            <Typography sx={{ flex: 1, textAlign: 'left', padding: '10px', fontFamily: 'Lato, sans-serif', color: '#757575' }}>
+                                {new Date(set.creationDate).toLocaleDateString()}
                             </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button
-                                size="large"
-                                variant="contained"
-                                sx={{ backgroundColor: '#9575CD' }}
-                                onClick={() => router.push('/generate')}
-                            >
-                                Generate with AI
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
-
-                {/* Create Custom Flashcards */}
-                <Grid item xs={12} md={6}>
-                    <Card sx={{ backgroundColor: '#D1C4E9', borderRadius: '8px' }}>
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom sx={{ color: '#3F51B5' }}>
-                                Create Custom Flashcards
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: '#5C6BC0' }}>
-                                Create and customize flashcards tailored to your learning needs.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button 
-                                size="large" 
-                                variant="contained" 
-                                sx={{ backgroundColor: '#9575CD' }}
-                                onClick={() => router.push('/flashcards_manager2/create')}
-                            >
-                                Create Custom Flashcards
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
-
-                {/* URL Feature */}
-                <Grid item xs={12} md={6}>
-                    <Card sx={{ backgroundColor: '#D1C4E9', borderRadius: '8px' }}>
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom sx={{ color: '#3F51B5' }}>
-                                URL Feature
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: '#5C6BC0' }}>
-                                Create your flashcards directly through a URL link.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button size="large" variant="contained" sx={{ backgroundColor: '#9575CD' }}>
-                                Edit via URL
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
-
-                {/* Quiz Feature */}
-                <Grid item xs={12} md={6}>
-                    <Card sx={{ backgroundColor: '#D1C4E9', borderRadius: '8px' }}>
-                        <CardContent>
-                            <Typography variant="h5" gutterBottom sx={{ color: '#3F51B5' }}>
-                                Quiz Feature
-                            </Typography>
-                            <Typography variant="body2" sx={{ color: '#5C6BC0' }}>
-                                Test your knowledge with customized quizzes based on your flashcards.
-                            </Typography>
-                        </CardContent>
-                        <CardActions>
-                            <Button
-                                size="large"
-                                variant="contained"
-                                sx={{ backgroundColor: '#9575CD' }}
-                                onClick={() => router.push(`/quiz/view?setId=${selectedSetId}`)} // Use the dynamic setId
-                            >
-                                Start a Quiz
-                            </Button>
-                        </CardActions>
-                    </Card>
-                </Grid>
-            </Grid>
-        </Container>
+                            <Box sx={{ flex: 1, textAlign: 'center' }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{
+                                        fontFamily: "'Lato', sans-serif",
+                                        backgroundColor: '#42A5F5',
+                                        '&:hover': { backgroundColor: '#1E88E5' },
+                                        transition: 'transform 0.2s ease-in-out',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        }
+                                    }}
+                                    onClick={() => router.push(`/flashcards_manager2/study/${set.id}`)}
+                                >
+                                    Study
+                                </Button>
+                            </Box>
+                            <Box sx={{ flex: 1, textAlign: 'center' }}>
+                                <Button
+                                    variant="contained"
+                                    color="primary"
+                                    sx={{
+                                        fontFamily: "'Lato', sans-serif",
+                                        backgroundColor: '#42A5F5',
+                                        '&:hover': { backgroundColor: '#1E88E5' },
+                                        transition: 'transform 0.2s ease-in-out',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        }
+                                    }}
+                                    onClick={() => alert('Quiz Mode not implemented yet')}
+                                >
+                                    Quiz
+                                </Button>
+                            </Box>
+                            <Box sx={{ flex: 1, textAlign: 'center' }}>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    sx={{
+                                        fontFamily: "'Lato', sans-serif",
+                                        backgroundColor: '#FF7043',
+                                        '&:hover': { backgroundColor: '#F4511E' },
+                                        transition: 'transform 0.2s ease-in-out',
+                                        '&:hover': {
+                                            transform: 'scale(1.05)',
+                                            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                        }
+                                    }}
+                                    onClick={() => router.push(`/flashcards_manager2/edit/${set.id}`)}
+                                >
+                                    Edit
+                                </Button>
+                            </Box>
+                        </Card>
+                    ))
+                ) : (
+                    <Typography variant="h6" align="center" sx={{ mt: 4, fontFamily: 'Lato, sans-serif', color: '#3F51B5' }}>
+                        No flashcard sets available.
+                    </Typography>
+                )}
+            </Container>
+        </Box>
     );
 }

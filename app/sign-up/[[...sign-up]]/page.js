@@ -15,7 +15,7 @@ export default function SignUpPage() {
             // Check if the sign-up is completed successfully
             if (signUp.status === 'complete') {
                 // Redirect to the Free Dashboard
-                router.push('/free-dashboard');
+                router.push('/flashcards_manager/view');
             }
         }
     }, [isLoaded, signUp, router]);
@@ -65,7 +65,7 @@ export default function SignUpPage() {
                         path="/sign-up"
                         routing="path"
                         signInUrl="/sign-in"
-                        afterSignUpUrl="/free-dashboard"  // Redirects to the Free Dashboard
+                        afterSignUpUrl="/flashcards_manager/view"  // Redirects to the Free Dashboard
                     />
                 </Box>
             </Box>
