@@ -5,6 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
 import { setDoc, doc } from 'firebase/firestore';
 import { db } from '../../../firebase';
+import { useUser } from '@clerk/nextjs';
 import {
     Container, Typography, Box, TextField, Button,
     Card, CardContent, Grid, IconButton, AppBar, Toolbar
@@ -18,6 +19,7 @@ export default function CreateFlashcards() {
     const [flipped, setFlipped] = useState({});
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+    const { user } = useUser();  // Getting the current user
 
     const handleFrontChange = (index, event) => {
         const updatedFlashcards = [...newFlashcards];
@@ -58,7 +60,11 @@ export default function CreateFlashcards() {
             const flashcardSetId = uuidv4();
             const flashcardsData = { name, flashcards: newFlashcards };
 
-            await setDoc(doc(db, 'flashcard_sets', flashcardSetId), flashcardsData);
+            // Using the user's UID to create a subcollection under the user's document
+            const userDocRef = doc(db, 'users', user.id);
+            const flashcardSetDocRef = doc(userDocRef, 'flashcard_sets', flashcardSetId);
+
+            await setDoc(flashcardSetDocRef, flashcardsData);
             alert('Flashcards saved successfully!');
             setName('');
             setNewFlashcards([{ front: '', back: '' }]);

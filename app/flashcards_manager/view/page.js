@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, doc } from 'firebase/firestore';
 import { db } from '../../../firebase';  
 import { Container, Grid, Typography, Box, CircularProgress, Card, CardContent, Button, TextField, AppBar, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -25,7 +25,9 @@ export default function DisplayFlashcardSets() {
             setError(null);
 
             try {
-                const colRef = collection(db, 'flashcard_sets');
+                // Reference to the user's flashcard_sets collection
+                const userDocRef = doc(db, 'users', user.id);
+                const colRef = collection(userDocRef, 'flashcard_sets');
                 const docsSnapshot = await getDocs(colRef);
                 const flashcardSetsData = [];
 
