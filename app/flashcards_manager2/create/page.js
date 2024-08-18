@@ -42,20 +42,21 @@ export default function CreateFlashcards() {
             alert("Please enter a name for the flashcard set");
             return;
         }
-
+    
         setLoading(true);
         try {
             const flashcardSetId = uuidv4(); // Generate a unique ID for the new flashcard set
             const flashcardsData = { id: flashcardSetId, name, flashcards: newFlashcards };
-
+    
             // Reference to the user's document in Firestore
             const userDocRef = doc(db, 'users', user.id);
-
+    
             // Save the flashcard set in the user's document
-            await updateDoc(userDocRef, {
+            // Use setDoc to ensure the document is created if it doesn't exist
+            await setDoc(userDocRef, {
                 flashcards: arrayUnion(flashcardsData) // Add the new set to the user's flashcards array
-            });
-
+            }, { merge: true }); // Use merge: true to update the existing array or create it if it doesn't exist
+    
             alert('Flashcards saved successfully!');
             setName('');
             setNewFlashcards([{ front: '', back: '' }]); // Reset the form after saving
@@ -66,6 +67,7 @@ export default function CreateFlashcards() {
             setLoading(false);
         }
     };
+    
 
     return (
         <Container maxWidth="md" sx={{ paddingTop: '2rem', paddingBottom: '2rem', backgroundColor: '#FFFFFF' }}>
