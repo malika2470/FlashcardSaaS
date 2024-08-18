@@ -53,15 +53,15 @@ export default function ProDashboard() {
                     <Card sx={{ backgroundColor: '#D1C4E9', borderRadius: '8px' }}>
                         <CardContent>
                             <Typography variant="h5" gutterBottom sx={{ color: '#3F51B5' }}>
-                                Create New Flashcard Sets
+                                Edit your previously made flashcard sets
                             </Typography>
                             <Typography variant="body2" sx={{ color: '#5C6BC0' }}>
-                                Start a new set of flashcards and organize them into folders.
+                                Add or delete your old flashcard sets. 
                             </Typography>
                         </CardContent>
                         <CardActions>
                             <Button size="large" variant="contained" sx={{ backgroundColor: '#9575CD' }}>
-                                Create New Set
+                                Edit my sets
                             </Button>
                         </CardActions>
                     </Card>
