@@ -187,8 +187,7 @@ export default function ProDashboard() {
                                 size="large"
                                 variant="contained"
                                 sx={{ backgroundColor: '#9575CD' }}
-                                onClick={() => router.push(`/quiz/display?setId=${selectedSetId}`)} // Use the dynamic setId
-                                disabled={!selectedSetId}
+                                onClick={() => router.push(`/quiz/view?setId=${selectedSetId}`)} // Use the dynamic setId
                             >
                                 Start a Quiz
                             </Button>

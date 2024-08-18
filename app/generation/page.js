@@ -13,7 +13,6 @@ export default function GenerateFlashcards() {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const [flashcardSetId, setFlashcardSetId] = useState(null); // State to hold the flashcard set ID
-    const [showQuizButton, setShowQuizButton] = useState(false); // State to control quiz button visibility
     const router = useRouter();
 
     const handleFrontChange = (index, event) => {
