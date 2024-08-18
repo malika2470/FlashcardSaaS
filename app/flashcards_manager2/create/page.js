@@ -1,5 +1,4 @@
-'use client';
-
+'use client'
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
@@ -19,8 +18,10 @@ export default function CreateFlashcards() {
     const [newFlashcards, setNewFlashcards] = useState([{ front: '', back: '' }]);
     const [flipped, setFlipped] = useState({});
     const [loading, setLoading] = useState(false);
-    const [open, setOpen] = useState(false);  // State to manage the dialog
-    const [url, setUrl] = useState('');  // State to manage the URL input
+    const [openUrlDialog, setOpenUrlDialog] = useState(false);
+    const [openAIDialog, setOpenAIDialog] = useState(false);
+    const [url, setUrl] = useState('');
+    const [topic, setTopic] = useState('');
     const router = useRouter();
     const { user } = useUser();
 
@@ -79,19 +80,60 @@ export default function CreateFlashcards() {
         }
     };
 
-    const handleOpenDialog = () => {
-        setOpen(true);
+    const handleOpenUrlDialog = () => {
+        setOpenUrlDialog(true);
     };
 
-    const handleCloseDialog = () => {
-        setOpen(false);
+    const handleCloseUrlDialog = () => {
+        setOpenUrlDialog(false);
+    };
+
+    const handleOpenAIDialog = () => {
+        setOpenAIDialog(true);
+    };
+
+    const handleCloseAIDialog = () => {
+        setOpenAIDialog(false);
     };
 
     const handleUrlSubmit = () => {
-        // Handle URL submission and generate flashcards based on the URL content
         alert(`Flashcards generated from URL: ${url}`);
         setUrl('');
-        setOpen(false);
+        setOpenUrlDialog(false);
+    };
+
+    const handleAISubmit = async () => {
+        if (!topic.trim()) {
+            alert("Please enter a topic to generate flashcards.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            const response = await fetch('/api/generate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'text/plain'
+                },
+                body: topic,
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to generate flashcards");
+            }
+
+            const generatedFlashcards = await response.json();
+            setNewFlashcards(generatedFlashcards);
+
+            alert(`Flashcards generated for topic: ${topic}`);
+            setTopic('');
+            setOpenAIDialog(false);
+        } catch (error) {
+            console.error("Error generating flashcards:", error);
+            alert("Error generating flashcards. Please try again.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -113,7 +155,8 @@ export default function CreateFlashcards() {
                 <Typography variant="h4" gutterBottom sx={{ fontFamily: 'Lato, sans-serif', color: '#3F51B5', fontWeight: 'bold', textAlign: 'center' }}>
                     Create New Flashcard Set
                 </Typography>
-                <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+
+                <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <TextField
                         label="Collection Name"
                         variant="outlined"
@@ -122,54 +165,71 @@ export default function CreateFlashcards() {
                         onChange={(e) => setName(e.target.value)}
                         sx={{ mb: 2, borderRadius: '8px' }}
                     />
-                    <Button
-                        variant="contained"
-                        onClick={handleOpenDialog}
-                        sx={{
-                            backgroundColor: '#42A5F5',
-                            '&:hover': { backgroundColor: '#1E88E5' },
-                            borderRadius: '8px',
-                            ml: 2,
-                            height: 'fit-content',
-                            alignSelf: 'flex-end',
-                            transition: 'transform 0.3s ease',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                            },
-                        }}
-                    >
-                        Generate from URL
-                    </Button>
+                    <Grid container spacing={2}>
+                        {newFlashcards.map((flashcard, index) => (
+                            <Grid item xs={12} sm={6} key={index} sx={{ display: 'flex', flexDirection: 'column' }}>
+                                <Card sx={{ mb: 2, borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
+                                    <CardContent>
+                                        <TextField
+                                            label="Front"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={flashcard.front}
+                                            onChange={(e) => handleFrontChange(index, e)}
+                                            sx={{ mb: 1, borderRadius: '8px' }}
+                                        />
+                                        <TextField
+                                            label="Back"
+                                            variant="outlined"
+                                            fullWidth
+                                            value={flashcard.back}
+                                            onChange={(e) => handleBackChange(index, e)}
+                                            sx={{ mb: 1, borderRadius: '8px' }}
+                                        />
+                                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                                            <IconButton onClick={() => handleRemoveFlashcard(index)} sx={{ color: '#E57373' }}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                            <Box sx={{ display: 'flex', gap: 1 }}>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleOpenUrlDialog}
+                                                    sx={{
+                                                        backgroundColor: '#42A5F5',
+                                                        '&:hover': { backgroundColor: '#1E88E5' },
+                                                        borderRadius: '8px',
+                                                        transition: 'transform 0.3s ease',
+                                                        '&:hover': {
+                                                            transform: 'scale(1.05)',
+                                                        },
+                                                    }}
+                                                >
+                                                    Generate from URL
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    onClick={handleOpenAIDialog}
+                                                    sx={{
+                                                        backgroundColor: '#42A5F5',
+                                                        '&:hover': { backgroundColor: '#1E88E5' },
+                                                        borderRadius: '8px',
+                                                        transition: 'transform 0.3s ease',
+                                                        '&:hover': {
+                                                            transform: 'scale(1.05)',
+                                                        },
+                                                    }}
+                                                >
+                                                    Generate from AI
+                                                </Button>
+                                            </Box>
+                                        </Box>
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        ))}
+                    </Grid>
                 </Box>
-                <Grid container spacing={2}>
-                    {newFlashcards.map((flashcard, index) => (
-                        <Grid item xs={12} sm={6} key={index}>
-                            <Card sx={{ mb: 2, borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
-                                <CardContent>
-                                    <TextField
-                                        label="Front"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={flashcard.front}
-                                        onChange={(e) => handleFrontChange(index, e)}
-                                        sx={{ mb: 1, borderRadius: '8px' }}
-                                    />
-                                    <TextField
-                                        label="Back"
-                                        variant="outlined"
-                                        fullWidth
-                                        value={flashcard.back}
-                                        onChange={(e) => handleBackChange(index, e)}
-                                        sx={{ mb: 1, borderRadius: '8px' }}
-                                    />
-                                    <IconButton onClick={() => handleRemoveFlashcard(index)} sx={{ color: '#E57373' }}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </CardContent>
-                            </Card>
-                        </Grid>
-                    ))}
-                </Grid>
+
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
                     <Button
                         variant="contained"
@@ -297,7 +357,7 @@ export default function CreateFlashcards() {
             </Container>
 
             {/* Dialog for URL input */}
-            <Dialog open={open} onClose={handleCloseDialog}>
+            <Dialog open={openUrlDialog} onClose={handleCloseUrlDialog}>
                 <DialogTitle>Generate Flashcards from URL</DialogTitle>
                 <DialogContent>
                     <TextField
@@ -312,10 +372,35 @@ export default function CreateFlashcards() {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog} sx={{ color: '#3F51B5' }}>
+                    <Button onClick={handleCloseUrlDialog} sx={{ color: '#3F51B5' }}>
                         Cancel
                     </Button>
                     <Button onClick={handleUrlSubmit} sx={{ color: '#3F51B5' }}>
+                        Generate
+                    </Button>
+                </DialogActions>
+            </Dialog>
+
+            {/* Dialog for AI topic input */}
+            <Dialog open={openAIDialog} onClose={handleCloseAIDialog}>
+                <DialogTitle>Generate Flashcards from AI</DialogTitle>
+                <DialogContent>
+                    <TextField
+                        autoFocus
+                        margin="dense"
+                        label="Enter a topic"
+                        type="text"
+                        fullWidth
+                        variant="outlined"
+                        value={topic}
+                        onChange={(e) => setTopic(e.target.value)}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseAIDialog} sx={{ color: '#3F51B5' }}>
+                        Cancel
+                    </Button>
+                    <Button onClick={handleAISubmit} sx={{ color: '#3F51B5' }}>
                         Generate
                     </Button>
                 </DialogActions>

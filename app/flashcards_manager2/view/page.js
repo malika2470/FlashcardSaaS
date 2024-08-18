@@ -1,8 +1,7 @@
-'use client';
-
+'use client'
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../firebase';  
 import { Container, Grid, Typography, Box, CircularProgress, Card, CardContent, Button, TextField, AppBar, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
@@ -25,15 +24,13 @@ export default function DisplayFlashcardSets() {
 
             try {
                 const userDocRef = doc(db, 'users', user.id); // Reference to the user's document
-                const docSnapshot = await getDoc(userDocRef);
+                const flashcardSetsCollectionRef = collection(userDocRef, 'flashcard_sets'); // Reference to the flashcard sets subcollection
 
-                if (docSnapshot.exists()) {
-                    const data = docSnapshot.data();
-                    const flashcardsArray = data.flashcards || []; // Access the array of flashcards
-                    setFlashcardSets(flashcardsArray);
-                } else {
-                    console.log('No such document!');
-                }
+                const querySnapshot = await getDocs(flashcardSetsCollectionRef);
+
+                const flashcardsArray = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                setFlashcardSets(flashcardsArray);
             } catch (error) {
                 console.error('Error fetching flashcard sets:', error);
                 setError('Failed to load flashcard sets. Please try again later.');
