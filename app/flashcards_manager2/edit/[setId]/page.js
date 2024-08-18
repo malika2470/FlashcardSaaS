@@ -2,7 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc, arrayRemove } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase';
 import { Container, Typography, Box, Button, Grid, Card, CardContent, TextField, AppBar, Toolbar, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -25,15 +25,15 @@ export default function EditFlashcardSet() {
             setError(null);
 
             try {
-                const userDocRef = doc(db, 'users', user.id);
-                const docSnapshot = await getDoc(userDocRef);
+                // Reference the specific flashcard set document in Firestore
+                const flashcardSetDocRef = doc(db, 'users', user.id, 'flashcard_sets', setId);
+                const docSnapshot = await getDoc(flashcardSetDocRef);
 
                 if (docSnapshot.exists()) {
-                    const data = docSnapshot.data();
-                    const flashcardSet = data.flashcards.find(set => set.id === setId);
-                    setFlashcardSet(flashcardSet);
+                    const flashcardSetData = docSnapshot.data();
+                    setFlashcardSet(flashcardSetData);
                 } else {
-                    setError('No such document found.');
+                    setError('No such flashcard set found.');
                 }
             } catch (error) {
                 console.error('Error fetching flashcard set:', error);
@@ -55,8 +55,8 @@ export default function EditFlashcardSet() {
         if (!flashcardSet) return;
 
         try {
-            const userDocRef = doc(db, 'users', user.id);
-            await updateDoc(userDocRef, {
+            const flashcardSetDocRef = doc(db, 'users', user.id, 'flashcard_sets', setId);
+            await updateDoc(flashcardSetDocRef, {
                 flashcards: flashcardSet.flashcards
             });
 
@@ -64,21 +64,6 @@ export default function EditFlashcardSet() {
         } catch (error) {
             console.error('Error updating flashcard set:', error);
             alert('Failed to update flashcard set. Please try again later.');
-        }
-    };
-
-    const handleDeleteSet = async () => {
-        try {
-            const userDocRef = doc(db, 'users', user.id);
-            await updateDoc(userDocRef, {
-                flashcards: arrayRemove(flashcardSet)
-            });
-
-            alert('Flashcard set deleted successfully!');
-            router.push('/flashcards_manager2/view');
-        } catch (error) {
-            console.error('Error deleting flashcard set:', error);
-            alert('Failed to delete flashcard set. Please try again later.');
         }
     };
 
@@ -168,7 +153,7 @@ export default function EditFlashcardSet() {
                                 </Grid>
                             ))}
                         </Grid>
-                        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+                        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -185,23 +170,6 @@ export default function EditFlashcardSet() {
                                 }}
                             >
                                 Save Changes
-                            </Button>
-                            <Button
-                                variant="contained"
-                                color="error"
-                                onClick={handleDeleteSet}
-                                sx={{
-                                    backgroundColor: '#FF7043',
-                                    '&:hover': { backgroundColor: '#F4511E' },
-                                    transition: 'transform 0.2s ease-in-out',
-                                    '&:hover': {
-                                        transform: 'scale(1.05)',
-                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                                    },
-                                    borderRadius: '8px'
-                                }}
-                            >
-                                Delete Set
                             </Button>
                         </Box>
                     </Box>

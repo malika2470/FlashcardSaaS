@@ -27,6 +27,7 @@ export default function GenerateFlashcards() {
         setFlashcards(newFlashcards);
     };
 
+
     const handleAddFlashcard = () => {
         setFlashcards([...flashcards, { front: '', back: '' }]);
     };

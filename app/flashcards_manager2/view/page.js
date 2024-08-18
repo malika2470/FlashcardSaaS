@@ -3,7 +3,7 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { doc, collection, getDocs } from 'firebase/firestore';
 import { db } from '../../../firebase';  
-import { Container, Grid, Typography, Box, CircularProgress, Card, CardContent, Button, TextField, AppBar, Toolbar } from '@mui/material';
+import { Container, Grid, Typography, Box, CircularProgress, Card, Button, TextField, AppBar, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { UserButton } from '@clerk/nextjs';
 
@@ -129,7 +129,6 @@ export default function DisplayFlashcardSets() {
                 {/* Header for the table */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', backgroundColor: '#3f51b5', color: '#FFFFFF', borderRadius: '8px 8px 0 0' }}>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Name</Typography>
-                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Date Created</Typography>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Study</Typography>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Quiz</Typography>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Edit</Typography>
@@ -141,9 +140,6 @@ export default function DisplayFlashcardSets() {
                         <Card key={set.id} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px', padding: '10px', borderRadius: '0 0 8px 8px', backgroundColor: '#f0f0f0', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
                             <Typography sx={{ flex: 1, textAlign: 'left', padding: '10px', fontFamily: 'Lato, sans-serif', color: '#3f51b5' }}>
                                 {set.name || 'Unnamed Set'}
-                            </Typography>
-                            <Typography sx={{ flex: 1, textAlign: 'left', padding: '10px', fontFamily: 'Lato, sans-serif', color: '#757575' }}>
-                                {new Date(set.creationDate).toLocaleDateString()}
                             </Typography>
                             <Box sx={{ flex: 1, textAlign: 'center' }}>
                                 <Button

@@ -22,27 +22,29 @@ export default function StudyMode() {
     useEffect(() => {
         async function fetchFlashcardSet() {
             if (!user || !setId) return;
-
+    
             setLoading(true);
             setError(null);
-
+    
             try {
-                const userDocRef = doc(db, 'users', user.id);
-                const docRef = doc(userDocRef, 'flashcard_sets', setId);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    setFlashcards(docSnap.data().flashcards);
+                // Reference the specific flashcard set document in Firestore
+                const flashcardSetDocRef = doc(db, 'users', user.id, 'flashcard_sets', setId);
+                const docSnapshot = await getDoc(flashcardSetDocRef);
+    
+                if (docSnapshot.exists()) {
+                    const flashcardSetData = docSnapshot.data();
+                    setFlashcards(flashcardSetData.flashcards || []);
                 } else {
                     setError('Flashcard set not found.');
                 }
             } catch (error) {
+                console.error('Error fetching flashcard set:', error);
                 setError('Failed to load flashcard set. Please try again later.');
             } finally {
                 setLoading(false);
             }
         }
-
+    
         if (isLoaded && isSignedIn) {
             fetchFlashcardSet();
         } else {
@@ -50,6 +52,7 @@ export default function StudyMode() {
             setError('You must be signed in to view and study flashcards.');
         }
     }, [user, isLoaded, isSignedIn, setId]);
+    
 
     const handleFlip = () => {
         setFlipped(!flipped);
@@ -162,67 +165,69 @@ export default function StudyMode() {
                     Study Mode
                 </Typography>
                 <Box
-                    sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: '100%',
-                        maxWidth: '900px',
-                        minHeight: '500px',
-                        backgroundColor: '#E3F2FD',
-                        border: '1px solid #ccc',
-                        borderRadius: '12px',
-                        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
-                        perspective: '1000px',
-                        position: 'relative',
-                        cursor: 'pointer',
-                    }}
-                    onClick={handleFlip}
-                >
-                    <Box
-                        sx={{
-                            width: '100%',
-                            minHeight: '500px',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            padding: 2,
-                            boxSizing: 'border-box',
-                            textAlign: 'center',
-                            borderRadius: '12px',
-                            transformStyle: 'preserve-3d',
-                            transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
-                            transition: 'transform 0.6s ease',
-                        }}
-                    >
-                        <Typography
-                            variant="h3"
-                            sx={{
-                                backfaceVisibility: 'hidden',
-                                fontFamily: 'Lato, sans-serif',
-                                color: '#3F51B5',
-                            }}
-                        >
-                            {flipped
-                                ? flashcards[currentCard].back
-                                : flashcards[currentCard].front}
-                        </Typography>
-                        <Typography
-                            variant="h3"
-                            sx={{
-                                backfaceVisibility: 'hidden',
-                                transform: 'rotateY(180deg)',
-                                position: 'absolute',
-                                fontFamily: 'Lato, sans-serif',
-                                color: '#3F51B5',
-                            }}
-                        >
-                            {flipped
-                                ? flashcards[currentCard].front
-                                : flashcards[currentCard].back}
-                        </Typography>
-                    </Box>
-                </Box>
+    sx={{
+        width: '100%',
+        minHeight: '500px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 2,
+        boxSizing: 'border-box',
+        textAlign: 'center',
+        borderRadius: '12px',
+        transformStyle: 'preserve-3d',
+        transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+        transition: 'transform 0.6s ease',
+        position: 'relative',
+    }}
+    onClick={handleFlip}
+>
+    <Box
+        sx={{
+            width: '100%',
+            minHeight: '500px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(0deg)',
+        }}
+    >
+        <Typography
+            variant="h3"
+            sx={{
+                fontFamily: 'Lato, sans-serif',
+                color: '#3F51B5',
+            }}
+        >
+            {flashcards[currentCard].front}
+        </Typography>
+    </Box>
+    <Box
+        sx={{
+            width: '100%',
+            minHeight: '500px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'absolute',
+            backfaceVisibility: 'hidden',
+            transform: 'rotateY(180deg)',
+        }}
+    >
+        <Typography
+            variant="h3"
+            sx={{
+                fontFamily: 'Lato, sans-serif',
+                color: '#3F51B5',
+            }}
+        >
+            {flashcards[currentCard].back}
+        </Typography>
+    </Box>
+</Box>
+
                 <Box
                     sx={{
                         display: 'flex',

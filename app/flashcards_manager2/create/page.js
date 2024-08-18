@@ -46,13 +46,6 @@ export default function CreateFlashcards() {
         setNewFlashcards(updatedFlashcards);
     };
 
-    const handleCardClick = (index) => {
-        setFlipped((prev) => ({
-            ...prev,
-            [index]: !prev[index],
-        }));
-    };
-
     const saveFlashcards = async () => {
         if (!name.trim()) {
             alert("Please enter a name for the flashcard set");
@@ -136,6 +129,14 @@ export default function CreateFlashcards() {
         }
     };
 
+    // This function handles flipping the flashcards
+    const handleCardClick = (index) => {
+        setFlipped((prev) => ({
+            ...prev,
+            [index]: !prev[index],
+        }));
+    };
+
     return (
         <Box sx={{ minHeight: '100vh', backgroundColor: '#E3F2FD' }}>
             <AppBar position="static" sx={{ backgroundColor: '#3F51B5', boxShadow: 'none', mb: 4 }}>
@@ -186,48 +187,48 @@ export default function CreateFlashcards() {
                                             onChange={(e) => handleBackChange(index, e)}
                                             sx={{ mb: 1, borderRadius: '8px' }}
                                         />
-                                        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                                            <IconButton onClick={() => handleRemoveFlashcard(index)} sx={{ color: '#E57373' }}>
-                                                <DeleteIcon />
-                                            </IconButton>
-                                            <Box sx={{ display: 'flex', gap: 1 }}>
-                                                <Button
-                                                    variant="contained"
-                                                    onClick={handleOpenUrlDialog}
-                                                    sx={{
-                                                        backgroundColor: '#42A5F5',
-                                                        '&:hover': { backgroundColor: '#1E88E5' },
-                                                        borderRadius: '8px',
-                                                        transition: 'transform 0.3s ease',
-                                                        '&:hover': {
-                                                            transform: 'scale(1.05)',
-                                                        },
-                                                    }}
-                                                >
-                                                    Generate from URL
-                                                </Button>
-                                                <Button
-                                                    variant="contained"
-                                                    onClick={handleOpenAIDialog}
-                                                    sx={{
-                                                        backgroundColor: '#42A5F5',
-                                                        '&:hover': { backgroundColor: '#1E88E5' },
-                                                        borderRadius: '8px',
-                                                        transition: 'transform 0.3s ease',
-                                                        '&:hover': {
-                                                            transform: 'scale(1.05)',
-                                                        },
-                                                    }}
-                                                >
-                                                    Generate from AI
-                                                </Button>
-                                            </Box>
-                                        </Box>
+                                        <IconButton onClick={() => handleRemoveFlashcard(index)} sx={{ color: '#E57373' }}>
+                                            <DeleteIcon />
+                                        </IconButton>
                                     </CardContent>
                                 </Card>
                             </Grid>
                         ))}
                     </Grid>
+                </Box>
+
+                {/* Moved Buttons Below Flashcard Input */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
+                    <Button
+                        variant="contained"
+                        onClick={handleOpenUrlDialog}
+                        sx={{
+                            backgroundColor: '#42A5F5',
+                            '&:hover': { backgroundColor: '#1E88E5' },
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                    >
+                        Generate from URL
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleOpenAIDialog}
+                        sx={{
+                            backgroundColor: '#42A5F5',
+                            '&:hover': { backgroundColor: '#1E88E5' },
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                    >
+                        Generate from AI
+                    </Button>
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
@@ -279,9 +280,9 @@ export default function CreateFlashcards() {
                                             backgroundColor: '#ffffff',
                                             cursor: 'pointer',
                                             perspective: '1000px',
+                                            transition: 'transform 0.6s ease-in-out',
                                             '&:hover': {
                                                 transform: flipped[index] ? 'none' : 'rotateY(180deg)',
-                                                transition: 'transform 0.6s ease-in-out',
                                             },
                                         }}
                                         onClick={() => handleCardClick(index)}

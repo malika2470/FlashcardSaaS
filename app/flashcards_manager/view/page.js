@@ -4,7 +4,7 @@ import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 import { collection, getDocs, doc } from 'firebase/firestore';
 import { db } from '../../../firebase';  
-import { Container, Grid, Typography, Box, CircularProgress, Card, CardContent, Button, TextField, AppBar, Toolbar } from '@mui/material';
+import { Container, Typography, Box, CircularProgress, Card, Button, TextField, AppBar, Toolbar } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { UserButton } from '@clerk/nextjs';
 
@@ -134,9 +134,7 @@ export default function DisplayFlashcardSets() {
                 {/* Header for the table */}
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: '0 10px', backgroundColor: '#3f51b5', color: '#FFFFFF', borderRadius: '8px 8px 0 0' }}>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Name</Typography>
-                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'left', padding: '10px' }}>Date Created</Typography>
                     <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Study</Typography>
-                    <Typography variant="h6" sx={{ flex: 1, textAlign: 'center', padding: '10px' }}>Edit</Typography>
                 </Box>
 
                 {/* List of Flashcard Sets */}
@@ -146,10 +144,7 @@ export default function DisplayFlashcardSets() {
                             <Typography sx={{ flex: 1, textAlign: 'left', padding: '10px', fontFamily: 'Lato, sans-serif', color: '#3f51b5' }}>
                                 {set.name || 'Unnamed Set'}
                             </Typography>
-                            <Typography sx={{ flex: 1, textAlign: 'left', padding: '10px', fontFamily: 'Lato, sans-serif', color: '#757575' }}>
-                                {new Date(set.creationDate).toLocaleDateString()}
-                            </Typography>
-                            <Box sx={{ flex: 1, textAlign: 'center' }}>
+                            <Box sx={{ flex: 1, textAlign: 'center', display: 'flex', justifyContent: 'center' }}>
                                 <Button
                                     variant="contained"
                                     color="primary"
@@ -166,25 +161,6 @@ export default function DisplayFlashcardSets() {
                                     onClick={() => router.push(`/flashcards_manager/study/${set.id}`)}
                                 >
                                     Study
-                                </Button>
-                            </Box>
-                            <Box sx={{ flex: 1, textAlign: 'center' }}>
-                                <Button
-                                    variant="contained"
-                                    color="secondary"
-                                    sx={{
-                                        fontFamily: "'Lato', sans-serif",
-                                        backgroundColor: '#FF7043',
-                                        '&:hover': { backgroundColor: '#F4511E' },
-                                        transition: 'transform 0.2s ease-in-out',
-                                        '&:hover': {
-                                            transform: 'scale(1.05)',
-                                            boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
-                                        }
-                                    }}
-                                    onClick={() => router.push(`/flashcards_manager/edit/${set.id}`)}
-                                >
-                                    Edit
                                 </Button>
                             </Box>
                         </Card>
