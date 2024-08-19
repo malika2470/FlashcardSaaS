@@ -157,6 +157,52 @@ export default function CreateFlashcards() {
                     Create New Flashcard Set
                 </Typography>
 
+                {/* Moved Buttons Below Flashcard Input */}
+                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 6, mb: 6 }}>
+                    <Button
+                        variant="contained"
+                        sx={{
+                            backgroundColor: '#0A1172',
+                            '&:hover': { backgroundColor: '#1E88E5' },
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}>Create your own</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleOpenUrlDialog}
+                        sx={{
+                            backgroundColor: '#0A1172', //Prev #42A5F5
+                            '&:hover': { backgroundColor: '#1E88E5' },
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                    >
+                        Generate from URL
+                    </Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleOpenAIDialog}
+                        sx={{
+                            backgroundColor: '#0A1172', //Prev #42A5F5
+                            '&:hover': { backgroundColor: '#1E88E5' },
+                            borderRadius: '8px',
+                            transition: 'transform 0.3s ease',
+                            '&:hover': {
+                                transform: 'scale(1.05)',
+                            },
+                        }}
+                    >
+                        Generate from AI
+                    </Button>
+                </Box>
+
+
                 <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                     <TextField
                         label="Collection Name"
@@ -172,17 +218,21 @@ export default function CreateFlashcards() {
                                 <Card sx={{ mb: 2, borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
                                     <CardContent>
                                         <TextField
-                                            label="Front"
+                                            label="Enter Front.."
                                             variant="outlined"
                                             fullWidth
+                                            multiline
+                                            rows={4}
                                             value={flashcard.front}
                                             onChange={(e) => handleFrontChange(index, e)}
                                             sx={{ mb: 1, borderRadius: '8px' }}
                                         />
                                         <TextField
-                                            label="Back"
+                                            label="Enter Back.."
                                             variant="outlined"
                                             fullWidth
+                                            multiline
+                                            rows={4}
                                             value={flashcard.back}
                                             onChange={(e) => handleBackChange(index, e)}
                                             sx={{ mb: 1, borderRadius: '8px' }}
@@ -195,40 +245,6 @@ export default function CreateFlashcards() {
                             </Grid>
                         ))}
                     </Grid>
-                </Box>
-
-                {/* Moved Buttons Below Flashcard Input */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mt: 4 }}>
-                    <Button
-                        variant="contained"
-                        onClick={handleOpenUrlDialog}
-                        sx={{
-                            backgroundColor: '#42A5F5',
-                            '&:hover': { backgroundColor: '#1E88E5' },
-                            borderRadius: '8px',
-                            transition: 'transform 0.3s ease',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                            },
-                        }}
-                    >
-                        Generate from URL
-                    </Button>
-                    <Button
-                        variant="contained"
-                        onClick={handleOpenAIDialog}
-                        sx={{
-                            backgroundColor: '#42A5F5',
-                            '&:hover': { backgroundColor: '#1E88E5' },
-                            borderRadius: '8px',
-                            transition: 'transform 0.3s ease',
-                            '&:hover': {
-                                transform: 'scale(1.05)',
-                            },
-                        }}
-                    >
-                        Generate from AI
-                    </Button>
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
@@ -281,9 +297,9 @@ export default function CreateFlashcards() {
                                             cursor: 'pointer',
                                             perspective: '1000px',
                                             transition: 'transform 0.6s ease-in-out',
-                                            '&:hover': {
+                                            /*'&:hover': {
                                                 transform: flipped[index] ? 'none' : 'rotateY(180deg)',
-                                            },
+                                            },  removed hover function due to mirroring issues*/
                                         }}
                                         onClick={() => handleCardClick(index)}
                                     >
@@ -392,6 +408,8 @@ export default function CreateFlashcards() {
                         label="Enter a topic"
                         type="text"
                         fullWidth
+                        multiline
+                        rows={10}
                         variant="outlined"
                         value={topic}
                         onChange={(e) => setTopic(e.target.value)}
