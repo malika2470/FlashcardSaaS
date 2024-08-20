@@ -189,10 +189,10 @@ export default function CreateFlashcards() {
                                             backgroundColor: '#ffffff',
                                             cursor: 'pointer',
                                             perspective: '1000px',
-                                            '&:hover': {
+                                            /*'&:hover': {
                                                 transform: flipped[index] ? 'none' : 'rotateY(180deg)',
                                                 transition: 'transform 0.6s ease-in-out',
-                                            },
+                                            },*/
                                         }}
                                         onClick={() => handleCardClick(index)}
                                     >
