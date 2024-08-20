@@ -1,32 +1,35 @@
 import json
 import os
 from dotenv import load_dotenv
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 import requests
 from bs4 import BeautifulSoup
 import openai
+from flask_cors import CORS
+
 
 # Load environment variables from .env.local
 load_dotenv(dotenv_path='.env.local')
 
-openai.api_key = (
-    "OPEN_API")
+openai.api_key = ('enter your own api key here')   
 
 if openai.api_key is None:
     raise ValueError(
         "OpenAI API key not found. Please check your .env.local file.")
 
 app = Flask(__name__)
+CORS(app)
 
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    return "Welcome to the Flashcard Generator API"
 
 
 @app.route('/generate-flashcards')
 def generate_flashcards():
     url = request.args.get('url')
+    print(f"Received URL: {url}")
 
     if not url:
         return jsonify({"error": "No URL provided"}), 400
@@ -40,6 +43,8 @@ def generate_flashcards():
         # Extract relevant text content
         paragraphs = [p.get_text() for p in soup.find_all('p')]
         content = "\n\n".join(paragraphs)
+
+        print(f"Extracted Content: {content[:500]}...")
 
         # Generate flashcards using OpenAI API
         messages = [
@@ -66,17 +71,26 @@ def generate_flashcards():
             temperature=0.5
         )
 
-        raw_flashcards = openai_response.choices[0].message['content'].strip()
-        flashcards_json = json.loads(raw_flashcards)
+        raw_flashcards = openai_response.choices[0]['message']['content'].strip(
+        )
 
-        print("Generated Flashcards:", flashcards_json)
+        try:
+            flashcards_json = json.loads(raw_flashcards)
+            print("Generated Flashcards:", flashcards_json)
+            return jsonify(flashcards_json)
+        except json.JSONDecodeError as e:
+            print(f"Error parsing JSON: {e}")
+            print(f"Raw response: {raw_flashcards}")
+            return jsonify({"error": "Invalid JSON received from OpenAI API"}), 500
 
-        return render_template('flashcards.html', flashcards=flashcards_json)
-
+    except requests.exceptions.RequestException as e:
+        print(f"An error occurred while fetching the URL: {e}")
+        return jsonify({"error": str(e)}), 500
     except Exception as e:
         print(f"An error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
+    print("Starting the Flask server...")
     app.run(port=5000, debug=True)

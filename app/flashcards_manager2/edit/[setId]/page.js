@@ -1,8 +1,7 @@
 'use client';
-
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
 import { db } from '../../../../firebase';
 import { Container, Typography, Box, Button, Grid, Card, CardContent, TextField, AppBar, Toolbar, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -25,7 +24,6 @@ export default function EditFlashcardSet() {
             setError(null);
 
             try {
-                // Reference the specific flashcard set document in Firestore
                 const flashcardSetDocRef = doc(db, 'users', user.id, 'flashcard_sets', setId);
                 const docSnapshot = await getDoc(flashcardSetDocRef);
 
@@ -67,6 +65,25 @@ export default function EditFlashcardSet() {
         }
     };
 
+    const handleDeleteSet = async () => {
+        try {
+            const flashcardSetDocRef = doc(db, 'users', user.id, 'flashcard_sets', setId);
+            await deleteDoc(flashcardSetDocRef);
+            alert('Flashcard set deleted successfully!');
+            router.push('/flashcards_manager2/view');
+        } catch (error) {
+            console.error('Error deleting flashcard set:', error);
+            alert('Failed to delete flashcard set. Please try again later.');
+        }
+    };
+
+    const handleAddFlashcard = () => {
+        if (flashcardSet) {
+            const newFlashcard = { front: '', back: '' };
+            setFlashcardSet({ ...flashcardSet, flashcards: [...flashcardSet.flashcards, newFlashcard] });
+        }
+    };
+
     if (loading) {
         return (
             <Container maxWidth="sm">
@@ -89,7 +106,6 @@ export default function EditFlashcardSet() {
 
     return (
         <Box sx={{ backgroundColor: '#f5f5f5', minHeight: '100vh', paddingBottom: '2rem' }}>
-            {/* Top App Bar */}
             <AppBar position="static" sx={{ backgroundColor: '#3f51b5', boxShadow: 'none', padding: '10px 0' }}>
                 <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography
@@ -153,7 +169,24 @@ export default function EditFlashcardSet() {
                                 </Grid>
                             ))}
                         </Grid>
-                        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'flex-end' }}>
+                        <Box sx={{ mt: 4, display: 'flex', justifyContent: 'space-between' }}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={handleAddFlashcard}
+                                sx={{
+                                    backgroundColor: '#42A5F5',
+                                    '&:hover': { backgroundColor: '#1E88E5' },
+                                    transition: 'transform 0.2s ease-in-out',
+                                    '&:hover': {
+                                        transform: 'scale(1.05)',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                    },
+                                    borderRadius: '8px'
+                                }}
+                            >
+                                Add Flashcard
+                            </Button>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -170,6 +203,23 @@ export default function EditFlashcardSet() {
                                 }}
                             >
                                 Save Changes
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="secondary"
+                                onClick={handleDeleteSet}
+                                sx={{
+                                    backgroundColor: '#E57373',
+                                    '&:hover': { backgroundColor: '#D32F2F' },
+                                    transition: 'transform 0.2s ease-in-out',
+                                    '&:hover': {
+                                        transform: 'scale(1.05)',
+                                        boxShadow: '0px 4px 15px rgba(0, 0, 0, 0.2)',
+                                    },
+                                    borderRadius: '8px'
+                                }}
+                            >
+                                Delete Set
                             </Button>
                         </Box>
                     </Box>

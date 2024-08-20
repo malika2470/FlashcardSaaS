@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import { useState } from "react";
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
@@ -89,11 +90,29 @@ export default function CreateFlashcards() {
         setOpenAIDialog(false);
     };
 
-    const handleUrlSubmit = () => {
-        alert(`Flashcards generated from URL: ${url}`);
-        setUrl('');
-        setOpenUrlDialog(false);
+    const handleUrlSubmit = async () => {
+        try {
+            const response = await fetch(`http://127.0.0.1:5000/generate-flashcards?url=${encodeURIComponent(url)}`);
+            if (!response.ok) {
+                throw new Error('Failed to generate flashcards from URL');
+            }
+    
+            const generatedFlashcards = await response.json();
+            if (generatedFlashcards.flashcards) {
+                setNewFlashcards(generatedFlashcards.flashcards);
+            } else {
+                throw new Error('Invalid response format');
+            }
+    
+            setUrl('');
+            setOpenUrlDialog(false);
+        } catch (error) {
+            console.error("Error generating flashcards:", error);
+            alert("Error generating flashcards from URL. Please try again.");
+        }
     };
+    
+    
 
     const handleAISubmit = async () => {
         if (!topic.trim()) {
@@ -127,14 +146,6 @@ export default function CreateFlashcards() {
         } finally {
             setLoading(false);
         }
-    };
-
-    // This function handles flipping the flashcards
-    const handleCardClick = (index) => {
-        setFlipped((prev) => ({
-            ...prev,
-            [index]: !prev[index],
-        }));
     };
 
     return (
