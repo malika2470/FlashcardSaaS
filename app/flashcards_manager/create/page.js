@@ -112,17 +112,21 @@ export default function CreateFlashcards() {
                                 <Card sx={{ mb: 2, borderRadius: '12px', boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)' }}>
                                     <CardContent>
                                         <TextField
-                                            label="Front"
+                                            label="Enter Front"
                                             variant="outlined"
                                             fullWidth
+                                            multiline
+                                            rows={4}
                                             value={flashcard.front}
                                             onChange={(e) => handleFrontChange(index, e)}
                                             sx={{ mb: 1, borderRadius: '8px' }}
                                         />
                                         <TextField
-                                            label="Back"
+                                            label="Enter Back"
                                             variant="outlined"
                                             fullWidth
+                                            multiline
+                                            rows={4}
                                             value={flashcard.back}
                                             onChange={(e) => handleBackChange(index, e)}
                                             sx={{ mb: 1, borderRadius: '8px' }}
