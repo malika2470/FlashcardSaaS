@@ -26,6 +26,13 @@ export default function CreateFlashcards() {
     const router = useRouter();
     const { user } = useUser();
 
+    const handleCardClick = (index) => {
+        setFlipped(prevFlipped => ({
+            ...prevFlipped,
+            [index]: !prevFlipped[index] // Toggle the flip state for the clicked card
+        }));
+    };
+
     const handleFrontChange = (index, event) => {
         const updatedFlashcards = [...newFlashcards];
         updatedFlashcards[index].front = event.target.value;
